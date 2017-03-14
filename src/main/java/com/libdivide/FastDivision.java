@@ -1,4 +1,4 @@
-package com.libdivide4j;
+package com.libdivide;
 
 /**
  * Fast modular arithmetics for 64-bit integers (both signed and unsigned).
@@ -6,13 +6,9 @@ package com.libdivide4j;
  * The code for fast division with preconditioning is adapted from C libdivide library ({@literal http://github.com/ridiculousfish/libdivide})
  *
  * @author Stanislav Poslavsky
- * @since 1.0
  */
 public final class FastDivision {
     private FastDivision() {}
-
-    /** 2^32 - 1 */
-    public static final long MAX_UNSIGNED_INT32 = (1L << 32) - 1;
 
     /**
      * Returns highest 64 bits of (signed) long multiplication.
@@ -148,7 +144,7 @@ public final class FastDivision {
      * @param d the divider (must be positive)
      * @return the magic
      */
-    public static MagicDivider magicUnsigned(long d) {
+    public static Magic magicUnsigned(long d) {
         return magicUnsigned(d, false);
     }
 
@@ -160,7 +156,7 @@ public final class FastDivision {
      * @param d the divider (must be positive)
      * @return the magic
      */
-    public static MagicDivider magicUnsigned(long d, boolean branchfree) {
+    public static Magic magicUnsigned(long d, boolean branchfree) {
         if (d == 0)
             throw new ArithmeticException("divide by zero");
         // 1 is not supported with branchfree algorithm
@@ -216,7 +212,7 @@ public final class FastDivision {
             // indicator. So floor_log_2_d happens to be correct in both cases,
             // which is why we do it outside of the if statement.
         }
-        return new MagicDivider(resultMagic, resultMore, d);
+        return new Magic(resultMagic, resultMore, d);
     }
 
     /**
@@ -228,7 +224,7 @@ public final class FastDivision {
      * @param divider  the divider
      * @return {@code dividend / divider }
      */
-    public static long divideUnsignedFast(long dividend, MagicDivider divider) {
+    public static long divideUnsignedFast(long dividend, Magic divider) {
         int more = divider.more;
         if ((more&0x80) != 0) {
             return dividend >>> (more&0x3F);
@@ -252,7 +248,7 @@ public final class FastDivision {
      * @param d the divider (must be positive)
      * @return the magic
      */
-    public static MagicDivider magicSigned(long d) {
+    public static Magic magicSigned(long d) {
         return magicSigned(d, false);
     }
 
@@ -265,7 +261,7 @@ public final class FastDivision {
      * @param branchfree use branch free computation
      * @return the magic
      */
-    public static MagicDivider magicSigned(long d, boolean branchfree) {
+    public static Magic magicSigned(long d, boolean branchfree) {
         if (d == 0)
             throw new ArithmeticException("divide by zero");
         assert (!branchfree || (d != 1 && d != -1));
@@ -330,7 +326,7 @@ public final class FastDivision {
             resultMore = more;
             resultMagic = magic;
         }
-        return new MagicDivider(resultMagic, resultMore, d);
+        return new Magic(resultMagic, resultMore, d);
     }
 
     /**
@@ -342,7 +338,7 @@ public final class FastDivision {
      * @param divider  the divider
      * @return {@code dividend / divider }
      */
-    public static long divideSignedFast(long dividend, MagicDivider divider) {
+    public static long divideSignedFast(long dividend, Magic divider) {
         int more = divider.more;
         long magic = divider.magic;
         if (magic == 0) { //shift path
@@ -376,7 +372,7 @@ public final class FastDivision {
      * @param divider  the divider
      * @return {@code dividend % divider }
      */
-    public static long remainderSignedFast(long dividend, MagicDivider divider) {
+    public static long remainderSignedFast(long dividend, Magic divider) {
         long quot = divideSignedFast(dividend, divider);
         return dividend - quot * divider.divider;
     }
@@ -388,7 +384,7 @@ public final class FastDivision {
      * @param divider  the divider
      * @return {@code dividend % divider }
      */
-    public static long remainderUnsignedFast(long dividend, MagicDivider divider) {
+    public static long remainderUnsignedFast(long dividend, Magic divider) {
         long quot = divideUnsignedFast(dividend, divider);
         return dividend - quot * divider.divider;
     }
@@ -401,7 +397,7 @@ public final class FastDivision {
      * @return {@code dividend / divider }
      * @see Math#floorDiv(long, long)
      */
-    public static long floorDivideFast(long dividend, MagicDivider divider) {
+    public static long floorDivideFast(long dividend, Magic divider) {
         long r = divideSignedFast(dividend, divider);
         // if the signs are different and modulo not zero, round down
         if ((dividend^divider.divider) < 0 && (r * divider.divider != dividend)) {
@@ -417,7 +413,7 @@ public final class FastDivision {
      * @param divider  the divider
      * @return {@code dividend % divider }
      */
-    public static long modSignedFast(long dividend, MagicDivider divider) {
+    public static long modSignedFast(long dividend, Magic divider) {
         return dividend - floorDivideFast(dividend, divider) * divider.divider;
     }
 
@@ -428,7 +424,7 @@ public final class FastDivision {
      * @param divider  the divider
      * @return {@code dividend % divider }
      */
-    public static long modUnsignedFast(long dividend, MagicDivider divider) {
+    public static long modUnsignedFast(long dividend, Magic divider) {
         return dividend - divideUnsignedFast(dividend, divider) * divider.divider;
     }
 
@@ -438,7 +434,7 @@ public final class FastDivision {
      * @param divider the divider (must be positive)
      * @return the magic
      */
-    public static MagicDivider magic32ForMultiplyMod(long divider) {
+    public static Magic magic32ForMultiplyMod(long divider) {
         long v = divider;
         int s = Long.numberOfLeadingZeros(v); // 0 <= s <= 63.
         if (s > 0)
@@ -455,7 +451,7 @@ public final class FastDivision {
      * @param magic32 magic for fast division {@link #magic32ForMultiplyMod(long)}
      * @return {@code (a*b)%divider }
      */
-    public static long multiplyMod128Unsigned(long a, long b, long divider, MagicDivider magic32) {
+    public static long multiplyMod128Unsigned(long a, long b, long divider, Magic magic32) {
         return multiplyMod128Unsigned0(multiplyHighUnsigned(a, b), multiplyLow(a, b), divider, magic32);
     }
 
@@ -468,7 +464,7 @@ public final class FastDivision {
      * @param magic32 magic for fast division {@link #magic32ForMultiplyMod(long)}
      * @return {@code (low|(high<<64))%divider}
      */
-    public static long multiplyMod128Unsigned0(long high, long low, long divider, MagicDivider magic32) {
+    public static long multiplyMod128Unsigned0(long high, long low, long divider, Magic magic32) {
         long b = (1L << 32); // Number base (16 bits).
         long
                 un1, un0,           // Norm. dividend LSD's.
@@ -529,33 +525,10 @@ public final class FastDivision {
         return r;
     }
 
-
-//    static long modul64(long x, long y, long z) {
-//        /*
-//        Divides (x || y) by z, for 64-bit integers x, y,
-//        and z, giving the remainder (modulus) as the result.
-//        Must have x < z (to get a 64-bit result). This is
-//        checked for.
-//        */
-//
-//        long i, t;
-//
-//        if (x >= z)
-//            throw new IllegalArgumentException();
-//
-//        for (i = 1; i <= 64; i++) {  // Do 64 times.
-//            t = x >>> 63;       // All 1's if x(63) = 1.
-//            x = (x << 1)|(y >>> 63); // Shift x || y left
-//            y = y << 1;               // one bit.
-//            if (Long.compareUnsigned((x|t), z) >= 0) {
-//                x = x - z;
-//                y = y + 1;
-//            }
-//        }
-//        return x;                    // Quotient is y.
-//    }
-
-    public static final class MagicDivider {
+    /**
+     * Magic structure.
+     */
+    public static final class Magic {
         /** The magic number */
         final long magic;
         /** Shifting bits **/
@@ -563,64 +536,10 @@ public final class FastDivision {
         /** The divider **/
         final long divider;
 
-        public MagicDivider(long magic, int more, long divider) {
+        public Magic(long magic, int more, long divider) {
             this.magic = magic;
             this.more = more;
             this.divider = divider;
-        }
-    }
-
-    /**
-     * Returns {@code base} in a power of {@code e} (non negative) modulo {@code modulus}
-     *
-     * @param base     base
-     * @param exponent exponent (non negative)
-     * @param modulus  the modulus < 2^32
-     * @return {@code base} in a power of {@code e} (non negative)
-     * @throws ArithmeticException if the result overflows a long
-     */
-    public static long powModUnsigned32(long base, long exponent, MagicDivider modulus) {
-        if (modulus.divider > MAX_UNSIGNED_INT32)
-            throw new IllegalArgumentException();
-
-        if (Long.compareUnsigned(base, modulus.divider) >= 0)
-            base = modUnsignedFast(base, modulus);
-
-        long result = 1L;
-        long k2p = base;
-        for (; ; ) {
-            if ((exponent&1) != 0)
-                result = modUnsignedFast(result * k2p, modulus);
-            exponent = exponent >> 1;
-            if (exponent == 0)
-                return result;
-            k2p = modUnsignedFast(k2p * k2p, modulus);
-        }
-    }
-
-    /**
-     * Returns {@code base} in a power of {@code e} (non negative) modulo {@code modulus}
-     *
-     * @param base     base
-     * @param exponent exponent (non negative)
-     * @param modulus  the modulus
-     * @return {@code base} in a power of {@code e} (non negative)
-     * @throws ArithmeticException if the result overflows a long
-     */
-    private static long powModUnsigned64(long base, long exponent, MagicDivider modulus, MagicDivider magic32) {
-        if (Long.compareUnsigned(base, modulus.divider) >= 0)
-            base = modUnsignedFast(base, modulus);
-
-        long result = 1L;
-        long k2p = base;
-
-        for (; ; ) {
-            if ((exponent&1) != 0)
-                result = multiplyMod128Unsigned(result, k2p, modulus.divider, magic32);
-            exponent = exponent >> 1;
-            if (exponent == 0)
-                return result;
-            k2p = multiplyMod128Unsigned(k2p, k2p, modulus.divider, magic32);
         }
     }
 }

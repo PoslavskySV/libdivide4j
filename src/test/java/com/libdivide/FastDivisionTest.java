@@ -1,4 +1,4 @@
-package com.libdivide4j;
+package com.libdivide;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well44497a;
@@ -9,7 +9,7 @@ import org.junit.Test;
 import java.math.BigInteger;
 import java.util.Objects;
 
-import static com.libdivide4j.FastDivision.*;
+import static com.libdivide.FastDivision.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -136,7 +136,7 @@ public class FastDivisionTest {
             long dividend = rnd.nextLong();
             long divider = rnd.nextLong();
 
-            MagicDivider magic;
+            Magic magic;
             magic = magicUnsigned(divider, true);
             Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), divideUnsignedFast(dividend, magic));
             magic = magicUnsigned(divider, false);
@@ -153,7 +153,7 @@ public class FastDivisionTest {
     public void testDivideFast1() throws Exception {
         long dividend = -1;
         long divider = 324234234L;
-        MagicDivider magic = magicUnsigned(divider);
+        Magic magic = magicUnsigned(divider);
 
         BigInteger bDividend = valueOfUnsigned(dividend);
         BigInteger bDivider = valueOfUnsigned(divider);
@@ -165,7 +165,7 @@ public class FastDivisionTest {
     public void testDivideFast2() throws Exception {
         for (long dividend : new long[]{-1L, 1L, Long.MAX_VALUE, Long.MIN_VALUE})
             for (long divider : new long[]{Long.MAX_VALUE}) {
-                MagicDivider magic = magicSigned(divider, true);
+                Magic magic = magicSigned(divider, true);
                 Assert.assertEquals(dividend + "/" + divider, dividend / divider, divideSignedFast(dividend, magic));
                 magic = magicSigned(divider, false);
                 Assert.assertEquals(dividend + "/" + divider, dividend / divider, divideSignedFast(dividend, magic));
@@ -177,7 +177,7 @@ public class FastDivisionTest {
     public void testDivideFast3() throws Exception {
         for (long dividend : new long[]{-1L, 1L, Long.MAX_VALUE, Long.MIN_VALUE})
             for (long divider : new long[]{-1L, Long.MAX_VALUE, Long.MIN_VALUE}) {
-                MagicDivider magic = magicUnsigned(divider, true);
+                Magic magic = magicUnsigned(divider, true);
                 Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), divideUnsignedFast(dividend, magic));
                 magic = magicUnsigned(divider, false);
                 Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), divideUnsignedFast(dividend, magic));
@@ -207,7 +207,7 @@ public class FastDivisionTest {
                 for (int p = 1; p < 55; p++) {
                     long divider = sign * (1L << p);
 
-                    MagicDivider magic;
+                    Magic magic;
                     magic = magicUnsigned(divider, true);
                     Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), divideUnsignedFast(dividend, magic));
                     magic = magicUnsigned(divider, false);
@@ -247,15 +247,15 @@ public class FastDivisionTest {
             } while (Long.compareUnsigned(modulus, (1L << 62)) >= 0);
 
             BigInteger expected = valueOfUnsigned(a).multiply(valueOfUnsigned(b)).mod(valueOfUnsigned(modulus));
-            MagicDivider magic = magicUnsigned(modulus);
+            Magic magic = magicUnsigned(modulus);
             a = modUnsignedFast(a, magic);
             b = modUnsignedFast(b, magic);
-            MagicDivider magic32 = magic32ForMultiplyMod(modulus);
+            Magic magic32 = magic32ForMultiplyMod(modulus);
             Assert.assertEquals(a + "*" + b + " mod " + modulus, expected.longValue(), multiplyMod128Unsigned(a, b, modulus, magic32));
         }
     }
 
-    static long[] modulusBenchmarkFast(int n, long[] arr, MagicDivider magic) {
+    static long[] modulusBenchmarkFast(int n, long[] arr, Magic magic) {
         long r = 0;
         long timing = 0;
         for (int i = 0; i < n; i++) {
@@ -273,7 +273,7 @@ public class FastDivisionTest {
     static long[] modulusBenchmarkFast(int n, long[] arr, long divider) {
         long r = 0;
         long timing = 0;
-        MagicDivider magic = magicSigned(divider);
+        Magic magic = magicSigned(divider);
         for (int i = 0; i < n; i++) {
             long[] tmp = arr.clone();
             long start = System.nanoTime();
