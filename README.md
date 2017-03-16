@@ -11,39 +11,39 @@ Fast division by constant divisor is about 3 times faster then ordinary Java div
 ### Examples
 
 The typical use case is when you have to use divide operation many times with a fixed divisor.
+```java
+    long[] someData = ...;
+    long denominator = 45;
+    FastDivision.Magic magic = FastDivision.magicSigned(denominator);
 
-        long[] someData = ...;
-        long denominator = 45;
-        FastDivision.Magic magic = FastDivision.magicSigned(denominator);
-
-        long[] reduced = new long[someData.length];
-        for (int i = 0; i < someData.length; ++i){
-            // this is the same as someData[i] / denominator but 3 times faster
-            reduced[i] = FastDivision.divideSignedFast(someData[i], magic);
-        }
-
+    long[] reduced = new long[someData.length];
+    for (int i = 0; i < someData.length; ++i){
+        // this is the same as someData[i] / denominator but 3 times faster
+        reduced[i] = FastDivision.divideSignedFast(someData[i], magic);
+    }
+```
 
 Library supports operations with unsigned integers:
+```java
+    // large unsigned modulus
+    long largeModulus = Long.MAX_VALUE + 1;
+    // some large number
+    long someNum = Long.MAX_VALUE + 99999;
+    FastDivision.Magic magic = FastDivision.magicSigned(denominator);
 
-        // large unsigned modulus
-        long largeModulus = Long.MAX_VALUE + 1;
-        // some large number
-        long someNum = Long.MAX_VALUE + 99999;
-        FastDivision.Magic magic = FastDivision.magicSigned(denominator);
-
-        // this will give 99998 (obviously)
-        long reduced = FastDivision.modUnsignedFast(someNum, magic);
-        assert reduced == 99998;
-
+    // this will give 99998 (obviously)
+    long reduced = FastDivision.modUnsignedFast(someNum, magic);
+    assert reduced == 99998;
+```
 
 
 ### Maven
 
 Maven dependency:
-
-       <dependency>
-            <groupId>cc.redberry</groupId>
-            <artifactId>libdivide4j</artifactId>
-            <version>1.0</version>
-        </dependency>
-        
+```xml
+    <dependency>
+        <groupId>cc.redberry</groupId>
+        <artifactId>libdivide4j</artifactId>
+        <version>1.0</version>
+    </dependency>
+```        
