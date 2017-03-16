@@ -1,7 +1,19 @@
 package cc.redberry.libdivide4j;
 
 /**
- * Fast modular arithmetics for 64-bit integers (both signed and unsigned).
+ * Fast integer division and modulo operation (both signed and unsigned).
+ * <p>
+ * Usage example:
+ * <pre><code>
+ * long[] someData = ...
+ * long denominator = 45;
+ * FastDivision.Magic magic = FastDivision.magicSigned(denominator);
+ *
+ * long[] reduced = new long[someData.length];
+ * for (int i = 0; i < someData.length; ++i) {
+ *     // this is the same as someData[i] / denominator but 3 times faster
+ *     reduced[i] = FastDivision.divideSignedFast(someData[i], magic);
+ * }</code></pre>
  * <p>
  * The code for fast division with preconditioning is adapted from C libdivide library ({@literal http://github.com/ridiculousfish/libdivide})
  *
