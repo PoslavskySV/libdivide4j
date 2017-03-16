@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/PoslavskySV/libdivide4j.svg?branch=master)](https://travis-ci.org/PoslavskySV/libdivide4j)
+
+
 # libdivide4j
 Optimized integer division for Java
 
