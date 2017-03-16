@@ -1,4 +1,4 @@
-package com.libdivide;
+package cc.redberry.libdivide4j;
 
 /**
  * Fast modular arithmetics for 64-bit integers (both signed and unsigned).

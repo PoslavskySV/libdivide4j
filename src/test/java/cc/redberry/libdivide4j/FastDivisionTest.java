@@ -1,4 +1,4 @@
-package com.libdivide;
+package cc.redberry.libdivide4j;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well44497a;
@@ -9,7 +9,6 @@ import org.junit.Test;
 import java.math.BigInteger;
 import java.util.Objects;
 
-import static com.libdivide.FastDivision.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -65,8 +64,8 @@ public class FastDivisionTest {
             long x = rnd.nextLong();
             long y = rnd.nextLong();
 
-            long high = multiplyHighUnsigned(x, y);
-            long low = multiplyLow(x, y);
+            long high = FastDivision.multiplyHighUnsigned(x, y);
+            long low = FastDivision.multiplyLow(x, y);
 
             BigInteger num = valueOfUnsigned(y).multiply(valueOfUnsigned(x));
             long highExpected = highBits(num);
@@ -86,8 +85,8 @@ public class FastDivisionTest {
             long x = rnd.nextLong();
             long y = rnd.nextLong();
 
-            long high = multiplyHighSigned(x, y);
-            long low = multiplyLow(x, y);
+            long high = FastDivision.multiplyHighSigned(x, y);
+            long low = FastDivision.multiplyLow(x, y);
 
             BigInteger num = valueOfSigned(y).multiply(valueOfSigned(x));
             long highExpected = highBits(num);
@@ -103,8 +102,8 @@ public class FastDivisionTest {
     public void testMulHighUnsigned1() throws Exception {
         for (long x : new long[]{-1L, 1L, Long.MAX_VALUE, Long.MIN_VALUE})
             for (long y : new long[]{-1L, 1L, Long.MAX_VALUE, Long.MIN_VALUE}) {
-                long high = multiplyHighUnsigned(x, y);
-                long low = multiplyLow(x, y);
+                long high = FastDivision.multiplyHighUnsigned(x, y);
+                long low = FastDivision.multiplyLow(x, y);
 
                 BigInteger num = valueOfUnsigned(x).multiply(valueOfUnsigned(y));
                 long highExpected = highBits(num);
@@ -118,8 +117,8 @@ public class FastDivisionTest {
     public void testMulHighSigned1() throws Exception {
         for (long x : new long[]{-1L, 1L, Long.MAX_VALUE, Long.MIN_VALUE})
             for (long y : new long[]{-1L, 1L, Long.MAX_VALUE, Long.MIN_VALUE}) {
-                long high = multiplyHighSigned(x, y);
-                long low = multiplyLow(x, y);
+                long high = FastDivision.multiplyHighSigned(x, y);
+                long low = FastDivision.multiplyLow(x, y);
 
                 BigInteger num = valueOfSigned(x).multiply(valueOfSigned(y));
                 long highExpected = highBits(num);
@@ -136,16 +135,16 @@ public class FastDivisionTest {
             long dividend = rnd.nextLong();
             long divider = rnd.nextLong();
 
-            Magic magic;
-            magic = magicUnsigned(divider, true);
-            Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), divideUnsignedFast(dividend, magic));
-            magic = magicUnsigned(divider, false);
-            Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), divideUnsignedFast(dividend, magic));
+            FastDivision.Magic magic;
+            magic = FastDivision.magicUnsigned(divider, true);
+            Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), FastDivision.divideUnsignedFast(dividend, magic));
+            magic = FastDivision.magicUnsigned(divider, false);
+            Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), FastDivision.divideUnsignedFast(dividend, magic));
 
-            magic = magicSigned(divider, true);
-            Assert.assertEquals(dividend + "/" + divider, dividend / divider, divideSignedFast(dividend, magic));
-            magic = magicSigned(divider, false);
-            Assert.assertEquals(dividend + "/" + divider, dividend / divider, divideSignedFast(dividend, magic));
+            magic = FastDivision.magicSigned(divider, true);
+            Assert.assertEquals(dividend + "/" + divider, dividend / divider, FastDivision.divideSignedFast(dividend, magic));
+            magic = FastDivision.magicSigned(divider, false);
+            Assert.assertEquals(dividend + "/" + divider, dividend / divider, FastDivision.divideSignedFast(dividend, magic));
         }
     }
 
@@ -153,22 +152,22 @@ public class FastDivisionTest {
     public void testDivideFast1() throws Exception {
         long dividend = -1;
         long divider = 324234234L;
-        Magic magic = magicUnsigned(divider);
+        FastDivision.Magic magic = FastDivision.magicUnsigned(divider);
 
         BigInteger bDividend = valueOfUnsigned(dividend);
         BigInteger bDivider = valueOfUnsigned(divider);
 
-        Assert.assertEquals(bDividend.divide(bDivider).longValue(), divideUnsignedFast(dividend, magic));
+        Assert.assertEquals(bDividend.divide(bDivider).longValue(), FastDivision.divideUnsignedFast(dividend, magic));
     }
 
     @Test
     public void testDivideFast2() throws Exception {
         for (long dividend : new long[]{-1L, 1L, Long.MAX_VALUE, Long.MIN_VALUE})
             for (long divider : new long[]{Long.MAX_VALUE}) {
-                Magic magic = magicSigned(divider, true);
-                Assert.assertEquals(dividend + "/" + divider, dividend / divider, divideSignedFast(dividend, magic));
-                magic = magicSigned(divider, false);
-                Assert.assertEquals(dividend + "/" + divider, dividend / divider, divideSignedFast(dividend, magic));
+                FastDivision.Magic magic = FastDivision.magicSigned(divider, true);
+                Assert.assertEquals(dividend + "/" + divider, dividend / divider, FastDivision.divideSignedFast(dividend, magic));
+                magic = FastDivision.magicSigned(divider, false);
+                Assert.assertEquals(dividend + "/" + divider, dividend / divider, FastDivision.divideSignedFast(dividend, magic));
 
             }
     }
@@ -177,25 +176,25 @@ public class FastDivisionTest {
     public void testDivideFast3() throws Exception {
         for (long dividend : new long[]{-1L, 1L, Long.MAX_VALUE, Long.MIN_VALUE})
             for (long divider : new long[]{-1L, Long.MAX_VALUE, Long.MIN_VALUE}) {
-                Magic magic = magicUnsigned(divider, true);
-                Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), divideUnsignedFast(dividend, magic));
-                magic = magicUnsigned(divider, false);
-                Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), divideUnsignedFast(dividend, magic));
+                FastDivision.Magic magic = FastDivision.magicUnsigned(divider, true);
+                Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), FastDivision.divideUnsignedFast(dividend, magic));
+                magic = FastDivision.magicUnsigned(divider, false);
+                Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), FastDivision.divideUnsignedFast(dividend, magic));
             }
     }
 
     @Test
     public void testDivideFast4() throws Exception {
-        assertEquals(1432344, divideSignedFast(1432344, magicSigned(1)));
-        assertEquals(-1432344, divideSignedFast(1432344, magicSigned(-1)));
+        Assert.assertEquals(1432344, FastDivision.divideSignedFast(1432344, FastDivision.magicSigned(1)));
+        Assert.assertEquals(-1432344, FastDivision.divideSignedFast(1432344, FastDivision.magicSigned(-1)));
     }
 
     @Test
     public void testDivideFast5() throws Exception {
         long dividend = -941192;
         long divider = -8;
-        assertEquals(dividend / divider, divideSignedFast(dividend, magicSigned(divider, true)));
-        assertEquals(dividend / divider, divideSignedFast(dividend, magicSigned(divider, false)));
+        Assert.assertEquals(dividend / divider, FastDivision.divideSignedFast(dividend, FastDivision.magicSigned(divider, true)));
+        Assert.assertEquals(dividend / divider, FastDivision.divideSignedFast(dividend, FastDivision.magicSigned(divider, false)));
     }
 
     @Test
@@ -207,16 +206,16 @@ public class FastDivisionTest {
                 for (int p = 1; p < 55; p++) {
                     long divider = sign * (1L << p);
 
-                    Magic magic;
-                    magic = magicUnsigned(divider, true);
-                    Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), divideUnsignedFast(dividend, magic));
-                    magic = magicUnsigned(divider, false);
-                    Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), divideUnsignedFast(dividend, magic));
+                    FastDivision.Magic magic;
+                    magic = FastDivision.magicUnsigned(divider, true);
+                    Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), FastDivision.divideUnsignedFast(dividend, magic));
+                    magic = FastDivision.magicUnsigned(divider, false);
+                    Assert.assertEquals(dividend + "/" + divider, valueOfUnsigned(dividend).divide(valueOfUnsigned(divider)).longValue(), FastDivision.divideUnsignedFast(dividend, magic));
 
-                    magic = magicSigned(divider, true);
-                    Assert.assertEquals(dividend + "/" + divider, dividend / divider, divideSignedFast(dividend, magic));
-                    magic = magicSigned(divider, false);
-                    Assert.assertEquals(dividend + "/" + divider, dividend / divider, divideSignedFast(dividend, magic));
+                    magic = FastDivision.magicSigned(divider, true);
+                    Assert.assertEquals(dividend + "/" + divider, dividend / divider, FastDivision.divideSignedFast(dividend, magic));
+                    magic = FastDivision.magicSigned(divider, false);
+                    Assert.assertEquals(dividend + "/" + divider, dividend / divider, FastDivision.divideSignedFast(dividend, magic));
                 }
         }
     }
@@ -225,16 +224,16 @@ public class FastDivisionTest {
     public void testDivideFast7() throws Exception {
         long dividend = -3188646;
         long divider = -6;
-        assertEquals(dividend / divider, divideSignedFast(dividend, magicSigned(divider, false)));
-        assertEquals(dividend / divider, divideSignedFast(dividend, magicSigned(divider, true)));
+        Assert.assertEquals(dividend / divider, FastDivision.divideSignedFast(dividend, FastDivision.magicSigned(divider, false)));
+        Assert.assertEquals(dividend / divider, FastDivision.divideSignedFast(dividend, FastDivision.magicSigned(divider, true)));
     }
 
     @Test
     public void testDivideFast8() throws Exception {
         long dividend = -108969;
         long divider = -3;
-        assertEquals(dividend / divider, divideSignedFast(dividend, magicSigned(divider, false)));
-        assertEquals(dividend / divider, divideSignedFast(dividend, magicSigned(divider, true)));
+        Assert.assertEquals(dividend / divider, FastDivision.divideSignedFast(dividend, FastDivision.magicSigned(divider, false)));
+        Assert.assertEquals(dividend / divider, FastDivision.divideSignedFast(dividend, FastDivision.magicSigned(divider, true)));
     }
 
     @Test
@@ -247,22 +246,22 @@ public class FastDivisionTest {
             } while (Long.compareUnsigned(modulus, (1L << 62)) >= 0);
 
             BigInteger expected = valueOfUnsigned(a).multiply(valueOfUnsigned(b)).mod(valueOfUnsigned(modulus));
-            Magic magic = magicUnsigned(modulus);
-            a = modUnsignedFast(a, magic);
-            b = modUnsignedFast(b, magic);
-            Magic magic32 = magic32ForMultiplyMod(modulus);
-            Assert.assertEquals(a + "*" + b + " mod " + modulus, expected.longValue(), multiplyMod128Unsigned(a, b, modulus, magic32));
+            FastDivision.Magic magic = FastDivision.magicUnsigned(modulus);
+            a = FastDivision.modUnsignedFast(a, magic);
+            b = FastDivision.modUnsignedFast(b, magic);
+            FastDivision.Magic magic32 = FastDivision.magic32ForMultiplyMod(modulus);
+            Assert.assertEquals(a + "*" + b + " mod " + modulus, expected.longValue(), FastDivision.multiplyMod128Unsigned(a, b, modulus, magic32));
         }
     }
 
-    static long[] modulusBenchmarkFast(int n, long[] arr, Magic magic) {
+    static long[] modulusBenchmarkFast(int n, long[] arr, FastDivision.Magic magic) {
         long r = 0;
         long timing = 0;
         for (int i = 0; i < n; i++) {
             long[] tmp = arr.clone();
             long start = System.nanoTime();
             for (int j = 0; j < tmp.length; j++) {
-                tmp[j] = modSignedFast(tmp[j], magic);
+                tmp[j] = FastDivision.modSignedFast(tmp[j], magic);
                 r += tmp[j];
             }
             timing += System.nanoTime() - start;
@@ -273,12 +272,12 @@ public class FastDivisionTest {
     static long[] modulusBenchmarkFast(int n, long[] arr, long divider) {
         long r = 0;
         long timing = 0;
-        Magic magic = magicSigned(divider);
+        FastDivision.Magic magic = FastDivision.magicSigned(divider);
         for (int i = 0; i < n; i++) {
             long[] tmp = arr.clone();
             long start = System.nanoTime();
             for (int j = 0; j < tmp.length; j++) {
-                tmp[j] = modSignedFast(tmp[j], magic);
+                tmp[j] = FastDivision.modSignedFast(tmp[j], magic);
                 r += tmp[j];
             }
             timing += System.nanoTime() - start;

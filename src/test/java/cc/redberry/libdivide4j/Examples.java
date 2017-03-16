@@ -1,4 +1,4 @@
-package com.libdivide;
+package cc.redberry.libdivide4j;
 
 import org.junit.Test;
 
