@@ -5,6 +5,7 @@ package com.libdivide;
  * <p>
  * The code for fast division with preconditioning is adapted from C libdivide library ({@literal http://github.com/ridiculousfish/libdivide})
  *
+ * @author ridiculousfish (http://github.com/ridiculousfish/libdivide)
  * @author Stanislav Poslavsky
  */
 public final class FastDivision {
@@ -138,10 +139,8 @@ public final class FastDivision {
 
     /**
      * Computes magic for fast unsigned integer division.
-     * <p>
-     * Code taken from C libdivide library http://libdivide.com
      *
-     * @param d the divider (must be positive)
+     * @param d the divider
      * @return the magic
      */
     public static Magic magicUnsigned(long d) {
@@ -150,10 +149,8 @@ public final class FastDivision {
 
     /**
      * Computes magic for fast unsigned integer division.
-     * <p>
-     * Code taken from C libdivide library http://libdivide.com
      *
-     * @param d the divider (must be positive)
+     * @param d the divider
      * @return the magic
      */
     public static Magic magicUnsigned(long d, boolean branchfree) {
@@ -217,8 +214,6 @@ public final class FastDivision {
 
     /**
      * Returns unsigned {@code dividend / divider} using fast integer division
-     * <p>
-     * Code taken from C libdivide library http://libdivide.com
      *
      * @param dividend the dividend
      * @param divider  the divider
@@ -242,10 +237,8 @@ public final class FastDivision {
 
     /**
      * Computes magic for fast signed integer division.
-     * <p>
-     * Code taken from C libdivide library http://libdivide.com
      *
-     * @param d the divider (must be positive)
+     * @param d the divider
      * @return the magic
      */
     public static Magic magicSigned(long d) {
@@ -254,10 +247,8 @@ public final class FastDivision {
 
     /**
      * Computes magic for fast integer division.
-     * <p>
-     * Code taken from C libdivide library http://libdivide.com
      *
-     * @param d          the divider (must be positive)
+     * @param d          the divider
      * @param branchfree use branch free computation
      * @return the magic
      */
@@ -315,13 +306,13 @@ public final class FastDivision {
             proposed_m += 1;
             long magic = proposed_m;
 
-            // Mark if we are negative
-            if (d < 0) {
+//            //Mark if we are negative
+//            if (d < 0) {
 //                more |= 0x80;
 //                if (!branchfree) {
 //                    magic = -magic;
 //                }
-            }
+//            }
 
             resultMore = more;
             resultMagic = magic;
@@ -331,8 +322,6 @@ public final class FastDivision {
 
     /**
      * Returns signed {@code dividend / divider} using fast integer division
-     * <p>
-     * Code taken from C libdivide library http://libdivide.com
      *
      * @param dividend the dividend
      * @param divider  the divider

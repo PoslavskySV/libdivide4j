@@ -4,9 +4,54 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com</groupId>
+    <groupId>cc.redberry</groupId>
     <artifactId>libdivide4j</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+    <name>libdivide4j</name>
+    <url>https://github.com/PoslavskySV/libdivide4j/</url>
+    <description>
+        Optimized integer division for Java
+    </description>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+        <relativePath/>
+    </parent>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>PoslavskySV</id>
+            <email>stvlpos@mail.ru</email>
+            <name>Poslavsky Stanislav</name>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+                <role>tester</role>
+                <role>documentation</role>
+            </roles>
+            <timezone>UTC+04:00</timezone>
+            <url>https://github.com/PoslavskySV</url>
+        </developer>
+    </developers>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <scm>
+        <connection>scm:git:https://github.com/PoslavskySV/libdivide4j.git</connection>
+    </scm>
 
     <build>
         <plugins>
@@ -35,15 +80,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12</version>
-                <!--<configuration>-->
-                <!--<properties>-->
-                <!--<property>-->
-                <!--<name>listener</name>-->
-                <!--&lt;!&ndash; Resets the context before running each test &ndash;&gt;-->
-                <!--<value>cc.redberry.core.GlobalRunListener</value>-->
-                <!--</property>-->
-                <!--</properties>-->
-                <!--</configuration>-->
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -53,20 +89,6 @@
                     </descriptorRefs>
                 </configuration>
             </plugin>
-
-            <!--  <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin> -->
         </plugins>
     </build>
 

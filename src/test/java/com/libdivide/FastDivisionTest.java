@@ -307,8 +307,9 @@ public class FastDivisionTest {
 
             RandomGenerator rnd = getRandom();
             DescriptiveStatistics plain = new DescriptiveStatistics(), fast = new DescriptiveStatistics();
-            for (int i = 0; i < 20000; i++) {
-                if (i == 10000) {
+            long nIterations = its(2000, 20000);
+            for (int i = 0; i < nIterations; i++) {
+                if (i == nIterations / 2) {
                     fast.clear();
                     plain.clear();
                 }
