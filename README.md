@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/PoslavskySV/libdivide4j.svg?branch=master)](https://travis-ci.org/PoslavskySV/libdivide4j)
+[![Javadocs](http://www.javadoc.io/badge/cc.redberry/libdivide4j.svg)](http://www.javadoc.io/doc/cc.redberry/libdivide4j) [![Build Status](https://travis-ci.org/PoslavskySV/libdivide4j.svg?branch=master)](https://travis-ci.org/PoslavskySV/libdivide4j)
 
 
 # libdivide4j
