@@ -2,3 +2,6 @@ language: java
 jdk:
   - oraclejdk8
 sudo: false
+
+script:
+  - mvn test -DrunLongTests=true -B
