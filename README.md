@@ -29,7 +29,7 @@ Library supports operations with unsigned integers:
     long largeModulus = Long.MAX_VALUE + 1;
     // some large number
     long someNum = Long.MAX_VALUE + 99999;
-    FastDivision.Magic magic = FastDivision.magicSigned(denominator);
+    FastDivision.Magic magic = FastDivision.magicUnsigned(denominator);
 
     // this will give 99998 (obviously)
     long reduced = FastDivision.modUnsignedFast(someNum, magic);
