@@ -39,7 +39,7 @@ Library supports operations with unsigned integers:
 Maven dependency:
 
        <dependency>
-            <groupId>com.libdivide</groupId>
+            <groupId>cc.redberry</groupId>
             <artifactId>libdivide4j</artifactId>
             <version>1.0</version>
         </dependency>
