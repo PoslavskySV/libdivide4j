@@ -6,7 +6,9 @@ Optimized integer division for Java
 
 This is a Java fork of C/C++ libdivide library for fast integer division (http://libdivide.com and https://github.com/ridiculousfish/libdivide). 
 
-Fast division by constant divisor is about 3 times faster then ordinary Java divide operation on most of modern CPUs.
+Fast division by constant divisor is about 2-3 times faster then ordinary Java divide operation on most of modern CPUs.
+
+__Requirements:__ Java 8 or higher
 
 ### Examples
 
