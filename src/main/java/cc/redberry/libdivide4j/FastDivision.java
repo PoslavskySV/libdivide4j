@@ -529,13 +529,15 @@ public final class FastDivision {
     /**
      * Magic structure.
      */
-    public static final class Magic {
+    public static final class Magic
+            implements java.io.Serializable {
+        private static final long serialVersionUID = 1L;
         /** The magic number */
-        final long magic;
+        public final long magic;
         /** Shifting bits **/
-        final int more;
+        public final int more;
         /** The divider **/
-        final long divider;
+        public final long divider;
 
         public Magic(long magic, int more, long divider) {
             this.magic = magic;

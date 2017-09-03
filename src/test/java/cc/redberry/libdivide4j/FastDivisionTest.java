@@ -300,6 +300,24 @@ public class FastDivisionTest {
         return new long[]{timing, r};
     }
 
+
+    static final long DIVISOR_111287658L = 111287658L;
+
+    static long[] modulusBenchmarkPlainDivBy111287658(int n, long[] arr) {
+        long r = 0;
+        long timing = 0;
+        for (int i = 0; i < n; i++) {
+            long[] tmp = arr.clone();
+            long start = System.nanoTime();
+            for (int j = 0; j < tmp.length; j++) {
+                tmp[j] = Math.floorMod(tmp[j], DIVISOR_111287658L);
+                r += tmp[j];
+            }
+            timing += System.nanoTime() - start;
+        }
+        return new long[]{timing, r};
+    }
+
     @Test
     public void fastDivisionBenchmark1() throws Exception {
         for (boolean small : new boolean[]{true, false}) {
@@ -349,6 +367,36 @@ public class FastDivisionTest {
         }
     }
 
+    @Test
+    public void fastDivisionBenchmark2() throws Exception {
+
+        RandomGenerator rnd = getRandom();
+        DescriptiveStatistics plain = new DescriptiveStatistics(), fast = new DescriptiveStatistics();
+        long nIterations = its(2000, 20000);
+        for (int i = 0; i < nIterations; i++) {
+            if (i == nIterations / 2) {
+                fast.clear();
+                plain.clear();
+            }
+            long[] arr = new long[1000];
+            for (int j = 0; j < arr.length; j++)
+                arr[j] = Math.abs(rnd.nextLong());
+
+            long modulus = DIVISOR_111287658L;
+            long[] f = modulusBenchmarkFast(10, arr, FastDivision.magicSigned(modulus));
+            long[] p = modulusBenchmarkPlainDivBy111287658(10, arr);
+
+            assertEquals(f[1], p[1]);
+
+            fast.addValue(f[0]);
+            plain.addValue(p[0]);
+        }
+
+        System.out.println("==== Fast long modulus ====");
+        System.out.println("Mean timing: " + fast.getPercentile(50));
+        System.out.println("==== JVM inlined compilation-time constant modulus ====");
+        System.out.println("Mean timing: " + plain.getPercentile(50));
+    }
 
     /**
      * Whether to run time consuming tests
