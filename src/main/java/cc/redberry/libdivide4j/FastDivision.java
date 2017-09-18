@@ -2,20 +2,21 @@ package cc.redberry.libdivide4j;
 
 /**
  * Fast integer division and modulo operation (both signed and unsigned).
- * <p>
- * Usage example:
+ *
+ * <p> Usage example:
  * <pre><code>
  * long[] someData = ...
  * long denominator = 45;
  * FastDivision.Magic magic = FastDivision.magicSigned(denominator);
  *
  * long[] reduced = new long[someData.length];
- * for (int i = 0; i < someData.length; ++i) {
+ * for (int i = 0; i &lt; someData.length; ++i) {
  *     // this is the same as someData[i] / denominator but 3 times faster
  *     reduced[i] = FastDivision.divideSignedFast(someData[i], magic);
  * }</code></pre>
- * <p>
- * The code for fast division with preconditioning is adapted from C libdivide library ({@literal http://github.com/ridiculousfish/libdivide})
+ *
+ * <p>The code for fast division with preconditioning is adapted from C libdivide library ({@literal
+ * http://github.com/ridiculousfish/libdivide})
  *
  * @author ridiculousfish (http://github.com/ridiculousfish/libdivide)
  * @author Stanislav Poslavsky
@@ -32,13 +33,13 @@ public final class FastDivision {
      */
     public static long multiplyHighSigned(long x, long y) {
         long x_high = x >> 32;
-        long x_low = x&0xFFFFFFFFL;
+        long x_low = x & 0xFFFFFFFFL;
         long y_high = y >> 32;
-        long y_low = y&0xFFFFFFFFL;
+        long y_low = y & 0xFFFFFFFFL;
 
         long z2 = x_low * y_low;
         long t = x_high * y_low + (z2 >>> 32);
-        long z1 = t&0xFFFFFFFFL;
+        long z1 = t & 0xFFFFFFFFL;
         long z0 = t >> 32;
         z1 += x_low * y_high;
         return x_high * y_high + z0 + (z1 >> 32);
@@ -54,12 +55,12 @@ public final class FastDivision {
     public static long multiplyHighUnsigned(long x, long y) {
         long x_high = x >>> 32;
         long y_high = y >>> 32;
-        long x_low = x&0xFFFFFFFFL;
-        long y_low = y&0xFFFFFFFFL;
+        long x_low = x & 0xFFFFFFFFL;
+        long y_low = y & 0xFFFFFFFFL;
 
         long z2 = x_low * y_low;
         long t = x_high * y_low + (z2 >>> 32);
-        long z1 = t&0xFFFFFFFFL;
+        long z1 = t & 0xFFFFFFFFL;
         long z0 = t >>> 32;
         z1 += x_low * y_high;
         return x_high * y_high + z0 + (z1 >>> 32);
@@ -78,10 +79,8 @@ public final class FastDivision {
     }
 
     /**
-     * Return's quotient and remainder of 128 bit integer division by 64 bit integer.
-     * <p>
-     * Code taken from Hacker's Delight:
-     * http://www.hackersdelight.org/HDcode/divlu.c.
+     * Return's quotient and remainder of 128 bit integer division by 64 bit integer. <p> Code taken from Hacker's
+     * Delight: http://www.hackersdelight.org/HDcode/divlu.c.
      *
      * @param u1 highest 64 dividend bits
      * @param u0 lowest 64 dividend bits
@@ -106,19 +105,19 @@ public final class FastDivision {
         s = Long.numberOfLeadingZeros(v); // 0 <= s <= 63.
         if (s > 0) {
             v = v << s;         // Normalize divisor.
-            un64 = (u1 << s)|((u0 >>> (64 - s))&(-s >> 31));
+            un64 = (u1 << s) | ((u0 >>> (64 - s)) & (-s >> 31));
             un10 = u0 << s;     // Shift dividend left.
         } else {
             // Avoid undefined behavior.
-            un64 = u1|u0;
+            un64 = u1 | u0;
             un10 = u0;
         }
 
         vn1 = v >>> 32;            // Break divisor up into
-        vn0 = v&0xFFFFFFFFL;     // two 32-bit digits.
+        vn0 = v & 0xFFFFFFFFL;     // two 32-bit digits.
 
         un1 = un10 >>> 32;         // Break right half of
-        un0 = un10&0xFFFFFFFFL;  // dividend into two digits.
+        un0 = un10 & 0xFFFFFFFFL;  // dividend into two digits.
 
         q1 = Long.divideUnsigned(un64, vn1);            // Compute the first
         rhat = un64 - q1 * vn1;     // quotient digit, q1.
@@ -162,7 +161,8 @@ public final class FastDivision {
     /**
      * Computes magic for fast unsigned integer division.
      *
-     * @param d the divider
+     * @param d          the divider
+     * @param branchfree branching free
      * @return the magic
      */
     public static Magic magicUnsigned(long d, boolean branchfree) {
@@ -174,17 +174,17 @@ public final class FastDivision {
         long resultMagic;
         int resultMore;
         int floor_log_2_d = 63 - Long.numberOfLeadingZeros(d);
-        if ((d&(d - 1)) == 0) {
+        if ((d & (d - 1)) == 0) {
             // Power of 2
             if (!branchfree) {
                 resultMagic = 0;
-                resultMore = floor_log_2_d|0x80;
+                resultMore = floor_log_2_d | 0x80;
             } else {
                 // We want a magic number of 2**64 and a shift of floor_log_2_d
                 // but one of the shifts is taken up by LIBDIVIDE_ADD_MARKER, so we
                 // subtract 1 from the shift
                 resultMagic = 0;
-                resultMore = (floor_log_2_d - 1)|0x40;
+                resultMore = (floor_log_2_d - 1) | 0x40;
             }
         } else {
             long proposed_m, rem;
@@ -210,7 +210,7 @@ public final class FastDivision {
                 proposed_m += proposed_m;
                 long twice_rem = rem + rem;
                 if (twice_rem >= d || twice_rem < rem) proposed_m += 1;
-                more = floor_log_2_d|0x40;
+                more = floor_log_2_d | 0x40;
             }
             resultMagic = 1 + proposed_m;
             resultMore = more;
@@ -233,13 +233,13 @@ public final class FastDivision {
      */
     public static long divideUnsignedFast(long dividend, Magic divider) {
         int more = divider.more;
-        if ((more&0x80) != 0) {
-            return dividend >>> (more&0x3F);
+        if ((more & 0x80) != 0) {
+            return dividend >>> (more & 0x3F);
         } else {
             long q = multiplyHighUnsigned(divider.magic, dividend);
-            if ((more&0x40) != 0) {
+            if ((more & 0x40) != 0) {
                 long t = ((dividend - q) >>> 1) + q;
-                return t >>> (more&0x3F);
+                return t >>> (more & 0x3F);
             } else {
                 return q >>> more; // all upper bits are 0 - don't need to mask them off
             }
@@ -282,7 +282,7 @@ public final class FastDivision {
         int floor_log_2_d = 63 - Long.numberOfLeadingZeros(absD);
         // check if exactly one bit is set,
         // don't care if absD is 0 since that's divide by zero
-        if ((absD&(absD - 1)) == 0) {
+        if ((absD & (absD - 1)) == 0) {
             // Branchfree and non-branchfree cases are the same
             resultMagic = 0;
             resultMore = floor_log_2_d;//|(d < 0 ? 0x80 : 0);
@@ -313,7 +313,7 @@ public final class FastDivision {
                 // also set ADD_MARKER this is an annoying optimization that
                 // enables algorithm #4 to avoid the mask. However we always set it
                 // in the branchfree case
-                more = floor_log_2_d|0x40;
+                more = floor_log_2_d | 0x40;
             }
             proposed_m += 1;
             long magic = proposed_m;
@@ -343,23 +343,23 @@ public final class FastDivision {
         int more = divider.more;
         long magic = divider.magic;
         if (magic == 0) { //shift path
-            int shifter = more&0x3F;
-            long uq = dividend + ((dividend >> 63)&((1L << shifter) - 1));
+            int shifter = more & 0x3F;
+            long uq = dividend + ((dividend >> 63) & ((1L << shifter) - 1));
             long q = uq;
             q = q >> shifter;
             // must be arithmetic shift and then sign-extend
             long shiftMask = more >> 7;
-            q = (q^shiftMask) - shiftMask;
+            q = (q ^ shiftMask) - shiftMask;
             return divider.divider < 0 ? -q : q;
         } else {
             long uq = multiplyHighSigned(magic, dividend);
-            if ((more&0x40) != 0) {
+            if ((more & 0x40) != 0) {
                 // must be arithmetic shift and then sign extend
                 long sign = more >>> 7;
-                uq += (((long) dividend^sign) - sign);
+                uq += (((long) dividend ^ sign) - sign);
             }
             long q = (long) uq;
-            q >>= more&0x3F;
+            q >>= more & 0x3F;
             if (q < 0)
                 q += 1;
             return divider.divider < 0 ? -q : q;
@@ -391,7 +391,8 @@ public final class FastDivision {
     }
 
     /**
-     * Computes floor division of the dividend by the divider using fast integer division returning (meaningful for signed operations)
+     * Computes floor division of the dividend by the divider using fast integer division returning (meaningful for
+     * signed operations)
      *
      * @param dividend the dividend
      * @param divider  the divider
@@ -401,7 +402,7 @@ public final class FastDivision {
     public static long floorDivideFast(long dividend, Magic divider) {
         long r = divideSignedFast(dividend, divider);
         // if the signs are different and modulo not zero, round down
-        if ((dividend^divider.divider) < 0 && (r * divider.divider != dividend)) {
+        if ((dividend ^ divider.divider) < 0 && (r * divider.divider != dividend)) {
             r--;
         }
         return r;
@@ -483,19 +484,19 @@ public final class FastDivision {
         s = Long.numberOfLeadingZeros(divider); // 0 <= s <= 63.
         if (s > 0) {
             divider = divider << s;         // Normalize divisor.
-            un64 = (high << s)|((low >>> (64 - s))&(-s >> 31));
+            un64 = (high << s) | ((low >>> (64 - s)) & (-s >> 31));
             un10 = low << s;     // Shift dividend left.
         } else {
             // Avoid undefined behavior.
-            un64 = high|low;
+            un64 = high | low;
             un10 = low;
         }
 
         vn1 = divider >>> 32;            // Break divisor up into
-        vn0 = divider&0xFFFFFFFFL;     // two 32-bit digits.
+        vn0 = divider & 0xFFFFFFFFL;     // two 32-bit digits.
 
         un1 = un10 >>> 32;         // Break right half of
-        un0 = un10&0xFFFFFFFFL;  // dividend into two digits.
+        un0 = un10 & 0xFFFFFFFFL;  // dividend into two digits.
 
         q1 = divideUnsignedFast(un64, magic32);            // Compute the first
         rhat = un64 - q1 * vn1;     // quotient digit, q1.
