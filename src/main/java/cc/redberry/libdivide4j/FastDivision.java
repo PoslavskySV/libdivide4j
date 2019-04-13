@@ -21,6 +21,7 @@ package cc.redberry.libdivide4j;
  * @author ridiculousfish (http://github.com/ridiculousfish/libdivide)
  * @author Stanislav Poslavsky
  */
+@SuppressWarnings("Duplicates")
 public final class FastDivision {
     private FastDivision() {}
 
@@ -416,7 +417,11 @@ public final class FastDivision {
      * @return {@code dividend % divider }
      */
     public static long modSignedFast(long dividend, Magic divider) {
-        return dividend - floorDivideFast(dividend, divider) * divider.divider;
+        long div = divideSignedFast(dividend, divider);
+        long m = dividend - div * divider.divider;
+        if (m < 0)
+            m += divider.divider;
+        return m;
     }
 
     /**
