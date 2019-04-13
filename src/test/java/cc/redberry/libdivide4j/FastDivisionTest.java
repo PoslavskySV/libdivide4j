@@ -285,6 +285,22 @@ public class FastDivisionTest {
         return new long[]{timing, r};
     }
 
+    static long[] modulusBenchmarkFast2(int n, long[] arr, long divider) {
+        long r = 0;
+        long timing = 0;
+        Int64 magic = NewInt64(divider);
+        for (int i = 0; i < n; i++) {
+            long[] tmp = arr.clone();
+            long start = System.nanoTime();
+            for (int j = 0; j < tmp.length; j++) {
+                tmp[j] = mod(magic, tmp[j]);
+                r += tmp[j];
+            }
+            timing += System.nanoTime() - start;
+        }
+        return new long[]{timing, r};
+    }
+
     static long[] modulusBenchmarkPlain(int n, long[] arr, long modulus) {
         long r = 0;
         long timing = 0;
@@ -323,8 +339,8 @@ public class FastDivisionTest {
         for (boolean small : new boolean[]{true, false}) {
 
             RandomGenerator rnd = getRandom();
-            DescriptiveStatistics plain = new DescriptiveStatistics(), fast = new DescriptiveStatistics();
-            long nIterations = its(2000, 20000);
+            DescriptiveStatistics plain = new DescriptiveStatistics(), fast = new DescriptiveStatistics(), fast2 = new DescriptiveStatistics();
+            long nIterations = its(20009, 20000);
             for (int i = 0; i < nIterations; i++) {
                 if (i == nIterations / 2) {
                     fast.clear();
@@ -350,18 +366,24 @@ public class FastDivisionTest {
                 if (modulus == 0 || modulus == 1)
                     modulus = 123;
 
+                assert modulus > 0;
 
                 long[] f = modulusBenchmarkFast(10, arr, modulus);
+                long[] f2 = modulusBenchmarkFast2(10, arr, modulus);
                 long[] p = modulusBenchmarkPlain(10, arr, modulus);
 
                 assertEquals(f[1], p[1]);
+//                assertEquals(f2[1], p[1]);
 
                 fast.addValue(f[0]);
+                fast2.addValue(f2[0]);
                 plain.addValue(p[0]);
             }
 
             System.out.println("==== Fast long modulus ====");
             System.out.println("Mean timing: " + fast.getPercentile(50));
+            System.out.println("==== Fast2 long modulus ====");
+            System.out.println("Mean timing: " + fast2.getPercentile(50));
             System.out.println("==== Plain long modulus ====");
             System.out.println("Mean timing: " + plain.getPercentile(50));
         }
@@ -414,5 +436,147 @@ public class FastDivisionTest {
      */
     private static long its(long nSmall, long nLarge) {
         return runHard() ? nLarge : nSmall;
+    }
+
+
+    static final class Int64 {
+        final long absd;
+        final long hi, lo;
+        final boolean neg;
+
+        public Int64(long absd, long hi, long lo, boolean neg) {
+            this.absd = absd;
+            this.hi = hi;
+            this.lo = lo;
+            this.neg = neg;
+        }
+    }
+
+    static long[] Div64(long hi, long lo, long y) {
+        long two32 = 1L << 32;
+        long mask32 = two32 - 1;
+        if (y == 0) {
+            throw new RuntimeException();
+        }
+        if (y <= hi) {
+            throw new RuntimeException();
+        }
+
+        long s = Long.numberOfLeadingZeros(y);
+        y <<= s;
+
+        long yn1 = y >> 32;
+        long yn0 = y & mask32;
+        long un32 = hi << s | lo >> (64 - s);
+        long un10 = lo << s;
+        long un1 = un10 >> 32;
+        long un0 = un10 & mask32;
+        long q1 = Long.divideUnsigned(un32, yn1);
+        long rhat = un32 - q1 * yn1;
+
+        for (; q1 >= two32 || q1 * yn0 > two32 * rhat + un1; ) {
+            q1--;
+            rhat += yn1;
+            if (rhat >= two32) {
+                break;
+            }
+        }
+
+        long un21 = un32 * two32 + un1 - q1 * y;
+        long q0 = Long.divideUnsigned(un21, yn1);
+        rhat = un21 - q0 * yn1;
+
+        for (; q0 >= two32 || q0 * yn0 > two32 * rhat + un0; ) {
+            q0--;
+            rhat += yn1;
+            if (rhat >= two32) {
+                break;
+            }
+        }
+
+        return new long[]{q1 * two32 + q0, (un21 * two32 + un0 - q0 * y) >> s};
+
+    }
+
+    // Add64 returns the sum with carry of x, y and carry: sum = x + y + carry.
+// The carry input must be 0 or 1; otherwise the behavior is undefined.
+// The carryOut output is guaranteed to be 0 or 1.
+    static long[] Add64(long x, long y, long carry) {
+        long yc = y + carry;
+        long sum = x + yc;
+        long carryOut = 0;
+        if (sum < x || yc < y) {
+            carryOut = 1;
+        }
+        return new long[]{sum, carryOut};
+    }
+
+    static Int64 NewInt64(long d) {
+        boolean neg = false;
+        if (d < 0) {
+            neg = true;
+            d = -d;
+        }
+
+        long absd = d;
+        long hi = Long.divideUnsigned(~0, absd);
+        long r = ~0 - absd * Long.divideUnsigned(~0, absd);
+        long lo = Div64(r, ~0, absd)[0];
+
+
+        long c = 1;
+        if ((absd & (absd - 1)) == 0) {
+            c++;
+        }
+
+        long[] loc = Add64(lo, c, 0);
+        lo = loc[0];
+        c = loc[1];
+
+        hi = Add64(hi, 0, c)[0];
+        return new Int64(absd, hi, lo, neg);
+    }
+
+    // Mul64 returns the 128-bit product of x and y: (hi, lo) = x * y
+// with the product bits' upper half returned in hi and the lower
+// half returned in lo.
+    static long[] Mul64(long x, long y) {
+        long mask32 = 1L << 32 - 1;
+        long x0 = x & mask32;
+        long x1 = x >> 32;
+        long y0 = y & mask32;
+        long y1 = y >> 32;
+        long w0 = x0 * y0;
+        long t = x1 * y0 + w0 >> 32;
+        long w1 = t & mask32;
+        long w2 = t >> 32;
+        w1 += x0 * y1;
+        long hi = x1 * y1 + w2 + w1 >> 32;
+        long lo = x * y;
+        return new long[]{hi, lo};
+    }
+
+    static long mod(Int64 d, long n) {
+        boolean neg = false;
+        if (n < 0) {
+            n = -n;
+            neg = true;
+        }
+        long[] hilo = Mul64(d.lo, n);
+        long hi = hilo[0], lo = hilo[1];
+
+        hi += d.hi * n;
+        long modlo1 = Mul64(lo, d.absd)[0];
+
+        long[] modmodlo2 = Mul64(hi, d.absd);
+        long mod = modmodlo2[0];
+        long modlo2 = modmodlo2[1];
+
+        long c = Add64(modlo1, modlo2, 0)[1];
+        mod = Add64(mod, 0, c)[0];
+        if (neg) {
+            return -mod;
+        }
+        return mod;
     }
 }
