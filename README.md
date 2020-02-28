@@ -46,6 +46,6 @@ Maven dependency:
     <dependency>
         <groupId>cc.redberry</groupId>
         <artifactId>libdivide4j</artifactId>
-        <version>1.0</version>
+        <version>1.2</version>
     </dependency>
 ```        
